@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Pro: Ley de Senos y Cosenos</title>
+    <style>
+        :root {
+            --primary: #4f46e5; 
+            --primary-dark: #3730a3;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #334155;
+            --border: #cbd5e1;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --info: #0ea5e9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Tabs System */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 8px;
+            background-color: #e2e8f0; color: #475569; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn:hover { background-color: #cbd5e1; }
+        .tab-btn.active { background-color: var(--primary); color: white; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
+        .tab-btn.quiz-btn.active { background-color: var(--success); }
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+
+        /* Cards and Layout */
+        .grid-layout { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+        @media(max-width: 800px) { .grid-layout { grid-template-columns: 1fr; } }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card-title { color: var(--primary-dark); font-size: 18px; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary); padding-left: 10px; }
+        
+        /* Theory Styles */
+        .theory-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .theory-box h3 { color: #1e3a8a; margin-bottom: 10px; font-size: 16px; }
+        .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media(max-width: 600px) { .strategy-grid { grid-template-columns: 1fr; } }
+        .strategy-card { background: white; border: 1px solid var(--border); padding: 15px; border-radius: 8px; }
+        .strategy-card h4 { color: var(--primary-dark); border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-bottom: 10px;}
+        .math-formula { font-family: 'Cambria', serif; font-size: 18px; font-style: italic; font-weight: bold; text-align: center; display: block; margin: 10px 0; color: #334155;}
+        
+        /* Form Controls */
+        .selector { width: 100%; padding: 10px; border-radius: 6px; border: 2px solid var(--primary); margin-bottom: 15px; font-weight: bold; background: #eef2ff; color: var(--primary-dark); font-size: 15px;}
+        .input-group { margin-bottom: 15px; }
+        label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 5px; color: #475569; }
+        input[type="number"] { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-size: 15px;}
+        
+        /* Full Width Results Box */
+        .results-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 25px; margin-top: 5px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; }
+        .results-box.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .results-box.ambiguous { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        
+        .step-text { background: #ffffff; border: 1px solid var(--border); border-left: 4px solid var(--primary); padding: 15px; border-radius: 6px; margin-bottom: 12px; display: block; font-size: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+        .step-text code { font-family: 'Cambria', serif; font-size: 16px; font-style: italic; color: #0f172a; display: block; margin: 6px 0; background: #f1f5f9; padding: 6px 10px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        
+        .canvas-wrapper { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        canvas { background: white; border: 1px solid var(--border); border-radius: 8px; width: 100%; height: auto; max-width: 600px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Quiz Styles */
+        .quiz-question { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px dashed #e2e8f0; }
+        .quiz-option { display: block; margin-bottom: 8px; cursor: pointer; padding: 5px; border-radius: 5px;}
+        .quiz-option:hover { background-color: #f1f5f9; }
+        .btn-check { background: var(--success); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-check:hover { background: #16a34a; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+        
+        .image-placeholder { text-align: center; margin-bottom: 15px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; padding: 10px; }
+        .quiz-img { max-width: 100%; max-height: 250px; border-radius: 4px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Laboratorio Completo: Trigonometría</h1>
+        <p>Resolución de Triángulos Oblicuángulos</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-teoria')">1. Marco Teórico</button>
+        <button class="tab-btn" onclick="switchTab('tab-senos')">2. Ley de Senos</button>
+        <button class="tab-btn" onclick="switchTab('tab-cosenos')">3. Ley de Cosenos</button>
+        <button class="tab-btn quiz-btn" onclick="switchTab('tab-quiz')" style="background-color: #22c55e; color: white;">4. Quiz Práctico</button>
+    </div>
+
+    <div id="tab-teoria" class="tab-content active">
+        <div class="card">
+            <div class="card-title">¿Por qué y cuándo usamos estas Leyes?</div>
+            
+            <div class="theory-box">
+                <h3>1. El Límite de Pitágoras: Triángulos Oblicuángulos</h3>
+                <p>En niveles básicos aprendemos el <strong>Teorema de Pitágoras</strong> y las razones trigonométricas clásicas (Seno, Coseno, Tangente). Sin embargo, esas herramientas <strong>solo funcionan si el triángulo tiene un ángulo de 90° (triángulo rectángulo)</strong>. </p>
+                <p style="margin-top: 10px;">En problemas reales de topografía, ingeniería o navegación, la mayoría de los triángulos <strong>no tienen ángulos rectos</strong>. A estos se les conoce como <strong>Triángulos Oblicuángulos</strong>. Para poder calcular sus lados y ángulos desconocidos, necesitamos estrategias más generales: <strong>La Ley de los Senos y la Ley de los Cosenos.</strong></p>
+            </div>
+
+            <div class="card-title" style="margin-top: 30px;">Estrategia de Resolución: ¿Cómo elegir qué ley aplicar?</div>
+            <p style="margin-bottom: 20px;">El secreto de la trigonometría es diagnosticar qué datos tienes. Todo triángulo tiene 6 elementos (3 lados y 3 ángulos). Para resolverlo, necesitas conocer al menos <strong>3 de ellos</strong> (y al menos uno debe ser un lado). Según los datos que tengas, elige tu estrategia:</p>
+
+            <div class="strategy-grid">
+                <div class="strategy-card" style="border-left: 4px solid var(--info);">
+                    <h4>Cuándo usar: LEY DE SENOS</h4>
+                    <p>Relaciona la proporción directa entre un lado y el seno del ángulo opuesto a ese lado.</p>
+                    <span class="math-formula">a / sen(A) = b / sen(B) = c / sen(C)</span>
+                    <ul style="margin-left: 20px; font-size: 14px; margin-top: 10px;">
+                        <li><strong style="color:var(--info);">Caso AAL o ALA:</strong> Conoces dos ángulos y cualquier lado. Es el caso más directo porque puedes calcular el tercer ángulo restando de 180°.</li>
+                        <li><strong style="color:var(--info);">Caso LLA (El Caso Ambiguo):</strong> Conoces dos lados y el ángulo opuesto a uno de ellos. Se llama "ambiguo" porque matemáticamente puede resultar en 0, 1 o hasta 2 triángulos posibles.</li>
+                    </ul>
+                </div>
+
+                <div class="strategy-card" style="border-left: 4px solid var(--danger);">
+                    <h4>Cuándo usar: LEY DE COSENOS</h4>
+                    <p>Es una "generalización" del Teorema de Pitágoras. Relaciona los tres lados con un solo ángulo.</p>
+                    <span class="math-formula">c² = a² + b² - 2ab · cos(C)</span>
+                    <ul style="margin-left: 20px; font-size: 14px; margin-top: 10px;">
+                        <li><strong style="color:var(--danger);">Caso LAL:</strong> Conoces dos lados y el ángulo que se forma exactamente entre ellos. No tienes un "par" de lado-ángulo opuesto.</li>
+                        <li><strong style="color:var(--danger);">Caso LLL:</strong> Conoces los tres lados, pero ningún ángulo. Puedes despejar la fórmula para encontrar cualquier ángulo interior usando los inversos del coseno.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-senos" class="tab-content">
+        <div class="grid-layout">
+            <div class="card">
+                <div class="card-title">Datos Conocidos</div>
+                <select class="selector" id="senos_mode" onchange="toggleInputsSenos()">
+                    <option value="AAL">Caso AAL / ALA (2 Ángulos, 1 Lado)</option>
+                    <option value="LLA">Caso LLA (Ambiguo: 2 Lados, 1 Ángulo opuesto)</option>
+                </select>
+
+                <div id="inputs_AAL">
+                    <div class="input-group"><label>Ángulo A (°):</label><input type="number" id="AAL_A" value="45" min="1" max="179" oninput="calcSenos()"></div>
+                    <div class="input-group"><label>Ángulo B (°):</label><input type="number" id="AAL_B" value="60" min="1" max="179" oninput="calcSenos()"></div>
+                    <div class="input-group"><label>Lado 'a' (Opuesto a A):</label><input type="number" id="AAL_a" value="10" min="0.1" step="0.1" oninput="calcSenos()"></div>
+                </div>
+
+                <div id="inputs_LLA" style="display:none;">
+                    <div class="input-group"><label>Lado 'a' (Opuesto a A):</label><input type="number" id="LLA_a" value="10" min="0.1" step="0.1" oninput="calcSenos()"></div>
+                    <div class="input-group"><label>Lado 'b' (Adyacente a A):</label><input type="number" id="LLA_b" value="12" min="0.1" step="0.1" oninput="calcSenos()"></div>
+                    <div class="input-group"><label>Ángulo A (°):</label><input type="number" id="LLA_A" value="30" min="1" max="179" oninput="calcSenos()"></div>
+                </div>
+            </div>
+            
+            <div class="card canvas-wrapper">
+                <div class="card-title" style="width: 100%; text-align: left;">Visualización Dinámica</div>
+                <canvas id="canvasSenos" width="600" height="350"></canvas>
+            </div>
+        </div>
+        
+        <div id="res_senos" class="results-box"></div>
+    </div>
+
+    <div id="tab-cosenos" class="tab-content">
+        <div class="grid-layout">
+            <div class="card">
+                <div class="card-title">Datos Conocidos</div>
+                <select class="selector" id="cosenos_mode" onchange="toggleInputsCosenos()" style="border-color: #ef4444; color: #b91c1c;">
+                    <option value="LAL">Caso LAL (2 Lados y el Ángulo COMPRENDIDO)</option>
+                    <option value="LLL">Caso LLL (Conocemos los 3 Lados)</option>
+                </select>
+
+                <div id="inputs_LAL">
+                    <div class="input-group"><label>Lado 'a':</label><input type="number" id="LAL_a" value="15" min="0.1" step="0.1" oninput="calcCosenos()"></div>
+                    <div class="input-group"><label>Lado 'b':</label><input type="number" id="LAL_b" value="20" min="0.1" step="0.1" oninput="calcCosenos()"></div>
+                    <div class="input-group"><label>Ángulo C (Entre a y b):</label><input type="number" id="LAL_C" value="75" min="1" max="179" oninput="calcCosenos()"></div>
+                </div>
+
+                <div id="inputs_LLL" style="display:none;">
+                    <div class="input-group"><label>Lado 'a':</label><input type="number" id="LLL_a" value="10" min="0.1" step="0.1" oninput="calcCosenos()"></div>
+                    <div class="input-group"><label>Lado 'b':</label><input type="number" id="LLL_b" value="15" min="0.1" step="0.1" oninput="calcCosenos()"></div>
+                    <div class="input-group"><label>Lado 'c':</label><input type="number" id="LLL_c" value="20" min="0.1" step="0.1" oninput="calcCosenos()"></div>
+                </div>
+            </div>
+            
+            <div class="card canvas-wrapper">
+                <div class="card-title" style="width: 100%; text-align: left;">Visualización Dinámica</div>
+                <canvas id="canvasCosenos" width="600" height="350"></canvas>
+            </div>
+        </div>
+        
+        <div id="res_cosenos" class="results-box"></div>
+    </div>
+
+    <div id="tab-quiz" class="tab-content">
+        <div class="card">
+            <div class="card-title">Cuestionario de Aplicación Práctica</div>
+            <p>Lee cuidadosamente cada problema, observa el diagrama correspondiente e identifica la estrategia. Resuelve y selecciona tu respuesta.</p>
+            <br>
+            
+            <div class="quiz-question">
+                <div class="image-placeholder">
+                    <img src="imagen_problema1.jpg" alt="[Diagrama del Problema 1: Caso LAL]" class="quiz-img">
+                </div>
+                <strong>1. Navegación marítima:</strong> Dos barcos salen del mismo puerto al mismo tiempo. El barco "Alfa" viaja en línea recta a 15 km/h y el barco "Beta" a 20 km/h. El ángulo entre sus rutas de navegación es de 60°. ¿A qué distancia se encontrarán el uno del otro después de transcurrir 2 horas ininterrumpidas?
+                <br><br>
+                <label class="quiz-option"><input type="radio" name="q1" value="A"> A) 25.40 km</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="correct"> B) 36.05 km</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="C"> C) 42.10 km</label>
+                <label class="quiz-option"><input type="radio" name="q1" value="D"> D) 72.11 km</label>
+            </div>
+
+            <div class="quiz-question">
+                <div class="image-placeholder">
+                    <img src="imagen_problema2.jpg" alt="[Diagrama del Problema 2: Caso ALA]" class="quiz-img">
+                </div>
+                <strong>2. Topografía e Inclinación:</strong> Un poste de luz está inclinado 10° respecto a la vertical alejándose del sol. El poste proyecta una sombra de 20 metros de largo. El ángulo de elevación del sol medido desde la punta de la sombra hacia el extremo superior del poste es de 45°. ¿Cuál es la longitud del poste?
+                <br><br>
+                <label class="quiz-option"><input type="radio" name="q2" value="A"> A) 14.14 m</label>
+                <label class="quiz-option"><input type="radio" name="q2" value="B"> B) 20.00 m</label>
+                <label class="quiz-option"><input type="radio" name="q2" value="correct"> C) 17.26 m</label>
+                <label class="quiz-option"><input type="radio" name="q2" value="D"> D) 18.50 m</label>
+            </div>
+
+            <button class="btn-check" onclick="checkQuiz()">Revisar Respuestas</button>
+            <div id="quiz-result" style="margin-top: 15px; font-weight: bold; font-size: 16px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const D2R = Math.PI / 180; const R2D = 180 / Math.PI;
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(tabId === 'tab-senos') calcSenos();
+        if(tabId === 'tab-cosenos') calcCosenos();
+    }
+
+    function drawTriangle(canvasId, a, b, c, A, B, C) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width; const H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        if(!a || !b || !c || isNaN(a) || isNaN(b) || isNaN(c)) return;
+
+        let ptA = { x: 0, y: 0 };
+        let ptB = { x: c, y: 0 };
+        let ptC = { x: b * Math.cos(A * D2R), y: b * Math.sin(A * D2R) };
+
+        let minX = Math.min(ptA.x, ptB.x, ptC.x); let maxX = Math.max(ptA.x, ptB.x, ptC.x);
+        let minY = Math.min(ptA.y, ptB.y, ptC.y); let maxY = Math.max(ptA.y, ptB.y, ptC.y);
+
+        let tW = maxX - minX; let tH = maxY - minY;
+        let padding = 60; 
+        let scale = Math.min((W - padding*2) / (tW || 1), (H - padding*2) / (tH || 1));
+        
+        let cx = minX + tW / 2; let cy = minY + tH / 2;
+
+        function tX(x) { return W / 2 + (x - cx) * scale; }
+        function tY(y) { return H / 2 - (y - cy) * scale; }
+
+        let pA = { x: tX(ptA.x), y: tY(ptA.y) };
+        let pB = { x: tX(ptB.x), y: tY(ptB.y) };
+        let pC = { x: tX(ptC.x), y: tY(ptC.y) };
+
+        ctx.beginPath(); ctx.moveTo(pA.x, pA.y); ctx.lineTo(pB.x, pB.y); ctx.lineTo(pC.x, pC.y); ctx.closePath();
+        ctx.fillStyle = "rgba(79, 70, 229, 0.1)"; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = "#3730a3"; ctx.stroke();
+
+        ctx.fillStyle = "#1e40af";
+        [pA, pB, pC].forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill(); });
+
+        let centX = (pA.x + pB.x + pC.x) / 3;
+        let centY = (pA.y + pB.y + pC.y) / 3;
+
+        function drawSmartLabel(text, pt, color, offset, isBold = false) {
+            let dx = pt.x - centX; let dy = pt.y - centY;
+            let dist = Math.sqrt(dx*dx + dy*dy) || 1;
+            ctx.fillStyle = color;
+            ctx.font = isBold ? "bold 14px sans-serif" : "14px sans-serif";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText(text, pt.x + (dx/dist) * offset, pt.y + (dy/dist) * offset);
+        }
+
+        drawSmartLabel(`A(${A.toFixed(1)}°)`, pA, "#ef4444", 25, true);
+        drawSmartLabel(`B(${B.toFixed(1)}°)`, pB, "#ef4444", 25, true);
+        drawSmartLabel(`C(${C.toFixed(1)}°)`, pC, "#ef4444", 25, true);
+
+        drawSmartLabel(`c=${c.toFixed(1)}`, {x: (pA.x+pB.x)/2, y: (pA.y+pB.y)/2}, "#047857", 18);
+        drawSmartLabel(`a=${a.toFixed(1)}`, {x: (pB.x+pC.x)/2, y: (pB.y+pC.y)/2}, "#047857", 18);
+        drawSmartLabel(`b=${b.toFixed(1)}`, {x: (pA.x+pC.x)/2, y: (pA.y+pC.y)/2}, "#047857", 18);
+    }
+
+    // --- LÓGICA SENOS ---
+    function toggleInputsSenos() {
+        let mode = document.getElementById('senos_mode').value;
+        document.getElementById('inputs_AAL').style.display = mode === 'AAL' ? 'block' : 'none';
+        document.getElementById('inputs_LLA').style.display = mode === 'LLA' ? 'block' : 'none';
+        calcSenos();
+    }
+
+    function calcSenos() {
+        let mode = document.getElementById('senos_mode').value;
+        let resBox = document.getElementById('res_senos');
+        const ctx = document.getElementById('canvasSenos').getContext('2d');
+        
+        if (mode === 'AAL') {
+            let A = parseFloat(document.getElementById('AAL_A').value);
+            let B = parseFloat(document.getElementById('AAL_B').value);
+            let a = parseFloat(document.getElementById('AAL_a').value);
+            
+            if (!A || !B || !a) { ctx.clearRect(0,0,600,400); resBox.innerHTML=""; return; }
+            if (A + B >= 180) { resBox.className = "results-box error full-width-results"; resBox.innerHTML = "Error: La suma de A + B debe ser menor a 180°."; ctx.clearRect(0,0,600,400); return; }
+            
+            let C = 180 - A - B;
+            let b = (a * Math.sin(B * D2R)) / Math.sin(A * D2R);
+            let c = (a * Math.sin(C * D2R)) / Math.sin(A * D2R);
+
+            resBox.className = "results-box full-width-results";
+            resBox.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px;">Procedimiento y Análisis</div>
+                <strong>Estrategia usada (AAL):</strong> Encontramos el tercer ángulo por propiedad geométrica y luego aplicamos razones directas de la Ley de Senos.<br><br>
+                <span class="step-text">
+                    <strong>1. Cálculo del Ángulo C:</strong>
+                    <code>Fórmula: C = 180° - (A + B)</code>
+                    <code>Sustitución: C = 180° - (${A}° + ${B}°)</code>
+                    Valor Resultante: <strong>C = ${C.toFixed(2)}°</strong>
+                </span>
+                <span class="step-text">
+                    <strong>2. Cálculo del Lado b:</strong>
+                    <code>Fórmula: b = (a · sen B) / sen A</code>
+                    <code>Sustitución: b = (${a} · sen ${B}°) / sen ${A}°</code>
+                    Valor Resultante: <strong>b = ${b.toFixed(2)}</strong>
+                </span>
+                <span class="step-text">
+                    <strong>3. Cálculo del Lado c:</strong>
+                    <code>Fórmula: c = (a · sen C) / sen A</code>
+                    <code>Sustitución: c = (${a} · sen ${C.toFixed(2)}°) / sen ${A}°</code>
+                    Valor Resultante: <strong>c = ${c.toFixed(2)}</strong>
+                </span>
+            `;
+            drawTriangle('canvasSenos', a, b, c, A, B, C);
+        } 
+        else if (mode === 'LLA') {
+            let a = parseFloat(document.getElementById('LLA_a').value);
+            let b = parseFloat(document.getElementById('LLA_b').value);
+            let A = parseFloat(document.getElementById('LLA_A').value);
+            
+            if (!A || !a || !b) { ctx.clearRect(0,0,600,400); resBox.innerHTML=""; return; }
+
+            if (A >= 90 && a <= b) {
+                resBox.className = "results-box error full-width-results";
+                resBox.innerHTML = `<strong>CASO AMBIGUO: 0 Triángulos</strong><br><span class="step-text">El ángulo A es ${A}°. En geometría, el lado opuesto a un ángulo obtuso o recto siempre debe ser el lado más largo del triángulo. Por lo tanto, 'a' (${a}) debe ser estrictamente mayor que 'b' (${b}). ¡Imposible formar triángulo!</span>`;
+                ctx.clearRect(0,0,600,400);
+                return;
+            }
+
+            let senB = (b * Math.sin(A * D2R)) / a;
+            let steps = `<div style="font-size: 18px; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px;">Procedimiento y Análisis</div>
+            <strong>Estrategia usada (LLA):</strong> Buscamos el ángulo opuesto B mediante la proporción de la Ley de Senos, analizando el valor algebraico para determinar el número de triángulos posibles.<br><br>
+            <span class="step-text">
+                <strong>1. Planteamiento de sen(B):</strong>
+                <code>Fórmula: sen(B) = (b · sen A) / a</code>
+                <code>Sustitución: sen(B) = (${b} · sen ${A}°) / ${a}</code>
+                Valor Algebraico Evaluado: <strong>sen(B) = ${senB.toFixed(4)}</strong>
+            </span>`;
+
+            if (senB > 1) {
+                resBox.className = "results-box error full-width-results";
+                resBox.innerHTML = `<strong>CASO AMBIGUO: 0 Triángulos</strong><br>${steps}
+                <span class="step-text" style="border-left-color: var(--danger);">
+                    <strong>Conclusión Algebraica:</strong>
+                    Dado que sen(B) > 1, no existe ningún ángulo real cuyo seno exceda la unidad. El lado 'a' es demasiado corto para cerrar la figura geométrica.
+                </span>`;
+                ctx.clearRect(0,0,600,400);
+            } else if (Math.abs(senB - 1) < 0.001) {
+                let B = 90; let C = 180 - A - B; let c = (a * Math.sin(C*D2R)) / Math.sin(A*D2R);
+                resBox.className = "results-box full-width-results";
+                resBox.innerHTML = `<strong>CASO AMBIGUO: 1 Triángulo (Rectángulo)</strong><br>${steps}
+                <span class="step-text">
+                    <strong>2. Ángulo B (Inverso):</strong>
+                    <code>Fórmula: B = sen⁻¹(sen B)</code>
+                    <code>Sustitución: B = sen⁻¹(1.0000)</code>
+                    Valor Resultante: <strong>B = 90.00°</strong>
+                </span>
+                <span class="step-text">
+                    <strong>3. Ángulo C y Lado c:</strong>
+                    <code>Fórmulas: C = 180°-(A+B)  |  c = (a · sen C)/sen A</code>
+                    <code>Sustituciones: C = 180°-(${A}°+90°)  |  c = (${a} · sen ${C.toFixed(2)}°)/sen ${A}°</code>
+                    Resultados: <strong>C = ${C.toFixed(2)}°</strong> y <strong>c = ${c.toFixed(2)}</strong>
+                </span>`;
+                drawTriangle('canvasSenos', a, b, c, A, B, C);
+            } else {
+                let B1 = Math.asin(senB) * R2D; let C1 = 180 - A - B1;
+                let B2 = 180 - B1; let C2 = 180 - A - B2;
+                
+                if (C1 > 0 && C2 <= 0) {
+                    let c1 = (a * Math.sin(C1*D2R)) / Math.sin(A*D2R);
+                    resBox.className = "results-box full-width-results";
+                    resBox.innerHTML = `<strong>CASO AMBIGUO: 1 Triángulo Único</strong><br>${steps}
+                    <span class="step-text">
+                        <strong>2. Cálculo del Ángulo B:</strong>
+                        <code>Fórmula: B = sen⁻¹(sen B)</code>
+                        <code>Sustitución: B = sen⁻¹(${senB.toFixed(4)})</code>
+                        Valor Resultante: <strong>B = ${B1.toFixed(2)}°</strong>
+                    </span>
+                    <span class="step-text">
+                        <strong>3. Cálculo del Ángulo C:</strong>
+                        <code>Fórmula: C = 180° - (A + B)</code>
+                        <code>Sustitución: C = 180° - (${A}° + ${B1.toFixed(2)}°)</code>
+                        Valor Resultante: <strong>C = ${C1.toFixed(2)}°</strong>
+                    </span>
+                    <span class="step-text">
+                        <strong>4. Cálculo del Lado c:</strong>
+                        <code>Fórmula: c = (a · sen C) / sen A</code>
+                        <code>Sustitución: c = (${a} · sen ${C1.toFixed(2)}°) / sen ${A}°</code>
+                        Valor Resultante: <strong>c = ${c1.toFixed(2)}</strong>
+                    </span>`;
+                    drawTriangle('canvasSenos', a, b, c1, A, B1, C1);
+                } else if (C1 > 0 && C2 > 0) {
+                    let c1 = (a * Math.sin(C1*D2R)) / Math.sin(A*D2R);
+                    let c2 = (a * Math.sin(C2*D2R)) / Math.sin(A*D2R);
+                    resBox.className = "results-box ambiguous full-width-results";
+                    resBox.innerHTML = `<strong>CASO AMBIGUO: ¡2 Triángulos Posibles!</strong><br>${steps}
+                    <span class="step-text">
+                        <strong>Análisis algebraico de cuadrantes (seno positivo en I y II):</strong>
+                        <code>Fórmulas: B₁ = sen⁻¹(sen B)  |  B₂ = 180° - B₁</code>
+                        <code>Sustituciones: B₁ = sen⁻¹(${senB.toFixed(4)})  |  B₂ = 180° - ${B1.toFixed(2)}°</code>
+                        Valores Obtenidos: <strong>B₁ = ${B1.toFixed(2)}°</strong> y <strong>B₂ = ${B2.toFixed(2)}°</strong>
+                    </span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <span class="step-text">
+                            <strong>Triángulo 1 (Ángulo B₁ Agudo):</strong>
+                            <code>C₁ = 180° - (${A}° + ${B1.toFixed(2)}°) = ${C1.toFixed(2)}°</code>
+                            <code>c₁ = (${a} · sen ${C1.toFixed(2)}°) / sen ${A}° = ${c1.toFixed(2)}</code>
+                        </span>
+                        <span class="step-text">
+                            <strong>Triángulo 2 (Ángulo B₂ Obtuso):</strong>
+                            <code>C₂ = 180° - (${A}° + ${B2.toFixed(2)}°) = ${C2.toFixed(2)}°</code>
+                            <code>c₂ = (${a} · sen ${C2.toFixed(2)}°) / sen ${A}° = ${c2.toFixed(2)}</code>
+                        </span>
+                    </div>
+                    <small style="color: #92400e; font-weight: bold;">*Se está dibujando el Triángulo 1 en pantalla.</small>`;
+                    drawTriangle('canvasSenos', a, b, c1, A, B1, C1);
+                }
+            }
+        }
+    }
+
+    // --- LÓGICA COSENOS ---
+    function toggleInputsCosenos() {
+        let mode = document.getElementById('cosenos_mode').value;
+        document.getElementById('inputs_LAL').style.display = mode === 'LAL' ? 'block' : 'none';
+        document.getElementById('inputs_LLL').style.display = mode === 'LLL' ? 'block' : 'none';
+        calcCosenos();
+    }
+
+    function calcCosenos() {
+        let mode = document.getElementById('cosenos_mode').value;
+        let resBox = document.getElementById('res_cosenos');
+        const ctx = document.getElementById('canvasCosenos').getContext('2d');
+
+        if (mode === 'LAL') {
+            let a = parseFloat(document.getElementById('LAL_a').value);
+            let b = parseFloat(document.getElementById('LAL_b').value);
+            let C = parseFloat(document.getElementById('LAL_C').value);
+
+            if (!a || !b || !C) { ctx.clearRect(0,0,600,400); resBox.innerHTML=""; return; }
+
+            let c2 = (a*a) + (b*b) - (2*a*b*Math.cos(C*D2R));
+            let c = Math.sqrt(c2);
+            let cosA = ((b*b) + (c*c) - (a*a)) / (2*b*c);
+            let A = Math.acos(Math.max(-1, Math.min(1, cosA))) * R2D;
+            let B = 180 - A - C;
+
+            resBox.className = "results-box full-width-results";
+            resBox.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px;">Procedimiento y Análisis</div>
+                <strong>Estrategia usada (LAL):</strong> Aplicar el Teorema de Pitágoras generalizado para determinar el tercer lado. Luego, despejar los ángulos interiores faltantes.<br><br>
+                <span class="step-text">
+                    <strong>1. Cálculo del Lado c (Ley de Cosenos):</strong>
+                    <code>Fórmula: c = √(a² + b² - 2ab · cos C)</code>
+                    <code>Sustitución: c = √(${a}² + ${b}² - 2(${a})(${b}) · cos ${C}°)</code>
+                    <code>Evaluación: c = √(${c2.toFixed(2)})</code>
+                    Valor Resultante: <strong>c = ${c.toFixed(2)}</strong>
+                </span>
+                <span class="step-text">
+                    <strong>2. Cálculo del Ángulo A (Despeje de Cosenos):</strong>
+                    <code>Fórmula: A = cos⁻¹[ (b² + c² - a²) / (2bc) ]</code>
+                    <code>Sustitución: A = cos⁻¹[ (${b}² + ${c.toFixed(2)}² - ${a}²) / (2 · ${b} · ${c.toFixed(2)}) ]</code>
+                    <code>Valor algebraico: cos(A) = ${(cosA).toFixed(4)}</code>
+                    Valor Resultante: <strong>A = ${A.toFixed(2)}°</strong>
+                </span>
+                <span class="step-text">
+                    <strong>3. Cálculo del Ángulo B:</strong>
+                    <code>Fórmula: B = 180° - (A + C)</code>
+                    <code>Sustitución: B = 180° - (${A.toFixed(2)}° + ${C}°)</code>
+                    Valor Resultante: <strong>B = ${B.toFixed(2)}°</strong>
+                </span>
+            `;
+            drawTriangle('canvasCosenos', a, b, c, A, B, C);
+        }
+        else if (mode === 'LLL') {
+            let a = parseFloat(document.getElementById('LLL_a').value);
+            let b = parseFloat(document.getElementById('LLL_b').value);
+            let c = parseFloat(document.getElementById('LLL_c').value);
+
+            if (!a || !b || !c) { ctx.clearRect(0,0,600,400); resBox.innerHTML=""; return; }
+
+            if (a+b <= c || a+c <= b || b+c <= a) {
+                resBox.className = "results-box error full-width-results";
+                resBox.innerHTML = "<strong>Error de Desigualdad Triangular:</strong> La suma de dos lados cualesquiera siempre debe ser mayor a la longitud del tercer lado.";
+                ctx.clearRect(0,0,600,400); return;
+            }
+
+            let cosA = ((b*b) + (c*c) - (a*a)) / (2*b*c);
+            let A = Math.acos(Math.max(-1, Math.min(1, cosA))) * R2D;
+            
+            let cosB = ((a*a) + (c*c) - (b*b)) / (2*a*c);
+            let B = Math.acos(Math.max(-1, Math.min(1, cosB))) * R2D;
+            
+            let C = 180 - A - B;
+
+            resBox.className = "results-box full-width-results";
+            resBox.innerHTML = `
+                <div style="font-size: 18px; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px;">Procedimiento y Análisis</div>
+                <strong>Estrategia usada (LLL):</strong> Despejar directamente los ángulos mediante la Ley de Cosenos utilizando las proporciones puramente métricas de los tres lados.<br><br>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <span class="step-text">
+                        <strong>1. Cálculo del Ángulo A:</strong>
+                        <code>Fórmula: A = cos⁻¹[ (b² + c² - a²) / (2bc) ]</code>
+                        <code>Sustitución: A = cos⁻¹[ (${b}² + ${c}² - ${a}²) / (2 · ${b} · ${c}) ]</code>
+                        <code>Valor algebraico: cos(A) = ${(cosA).toFixed(4)}</code>
+                        Valor Resultante: <strong>A = ${A.toFixed(2)}°</strong>
+                    </span>
+                    <span class="step-text">
+                        <strong>2. Cálculo del Ángulo B:</strong>
+                        <code>Fórmula: B = cos⁻¹[ (a² + c² - b²) / (2ac) ]</code>
+                        <code>Sustitución: B = cos⁻¹[ (${a}² + ${c}² - ${b}²) / (2 · ${a} · ${c}) ]</code>
+                        <code>Valor algebraico: cos(B) = ${(cosB).toFixed(4)}</code>
+                        Valor Resultante: <strong>B = ${B.toFixed(2)}°</strong>
+                    </span>
+                </div>
+                <span class="step-text">
+                    <strong>3. Cálculo del Ángulo C:</strong>
+                    <code>Fórmula: C = 180° - (A + B)</code>
+                    <code>Sustitución: C = 180° - (${A.toFixed(2)}° + ${B.toFixed(2)}°)</code>
+                    Valor Resultante: <strong>C = ${C.toFixed(2)}°</strong>
+                </span>
+            `;
+            drawTriangle('canvasCosenos', a, b, c, A, B, C);
+        }
+    }
+
+    // --- LOGICA DEL QUIZ ---
+    function checkQuiz() {
+        let q1 = document.querySelector('input[name="q1"]:checked');
+        let q2 = document.querySelector('input[name="q2"]:checked');
+        let res = document.getElementById('quiz-result');
+        let score = 0;
+
+        if(q1 && q1.value === "correct") score++;
+        if(q2 && q2.value === "correct") score++;
+
+        if(score === 2) {
+            res.innerHTML = "<span style='color: #15803d;'>¡Excelente análisis de rumbos y proporciones! Respondiste todo correctamente.</span><br><small style='color: #475569;'>Resolución Q1 (LAL): c = √(30² + 40² - 2(30)(40)cos(60°)) | Resolución Q2 (ALA): x = (20 * sen(45°)) / sen(55°)</small>";
+        } else {
+            res.innerHTML = `<span style='color: #b91c1c;'>Has acertado ${score} de 2 preguntas. ¡Usa la pestaña 1 (Marco Teórico) para repasar la estrategia e inténtalo de nuevo!</span><br><small style='color: #475569;'><strong>Pista 1:</strong> Tras 2 horas, las longitudes algebraicas de los lados son 30km y 40km con un ángulo de 60°. Usa Ley de Cosenos.<br><strong>Pista 2:</strong> Ángulos interiores: 80°, 45° y (180-80-45) = 55°. El lado de la sombra (20m) se opone al ángulo de 55°. Usa Ley de Senos.</small>`;
+        }
+    }
+
+    // Inicializar
+    calcSenos();
+</script>
+</body>
+</html>
