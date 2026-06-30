@@ -116,7 +116,22 @@
                 <div class="strategy-card" style="border-left: 4px solid var(--info);">
                     <h4>Cuándo usar: LEY DE SENOS</h4>
                     <p>Relaciona la proporción directa entre un lado y el seno del ángulo opuesto a ese lado.</p>
-                    <span class="math-formula">a / sen(A) = b / sen(B) = c / sen(C)</span>
+                    <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                          <mfrac>
+                            <mi>a</mi>
+                            <mrow><mi>sen</mi><mo>(</mo><mi>A</mi><mo>)</mo></mrow>
+                              </mfrac>
+                              <mo>=</mo>
+                              <mfrac>
+                                <mi>b</mi>
+                                <mrow><mi>sen</mi><mo>(</mo><mi>B</mi><mo>)</mo></mrow>
+                              </mfrac>
+                              <mo>=</mo>
+                              <mfrac>
+                                <mi>c</mi>
+                                <mrow><mi>sen</mi><mo>(</mo><mi>C</mi><mo>)</mo></mrow>
+                              </mfrac>
+                    </math>
                     <ul style="margin-left: 20px; font-size: 14px; margin-top: 10px;">
                         <li><strong style="color:var(--info);">Caso AAL o ALA:</strong> Conoces dos ángulos y cualquier lado. Es el caso más directo porque puedes calcular el tercer ángulo restando de 180°.</li>
                         <li><strong style="color:var(--info);">Caso LLA (El Caso Ambiguo):</strong> Conoces dos lados y el ángulo opuesto a uno de ellos. Se llama "ambiguo" porque matemáticamente puede resultar en 0, 1 o hasta 2 triángulos posibles.</li>
@@ -126,9 +141,9 @@
                 <div class="strategy-card" style="border-left: 4px solid var(--danger);">
                     <h4>Cuándo usar: LEY DE COSENOS</h4>
                     <p>Es una "generalización" del Teorema de Pitágoras. Relaciona los tres lados con un solo ángulo.</p>
-                    <span class="math-formula">a² = b² + c² - 2bc · cos(A)</span>
-                    <span class="math-formula">b² = a² + c² - 2ac · cos(B)</span>
-                    <span class="math-formula">c² = a² + b² - 2ab · cos(C)</span>
+                    <span class="math-formula">a² = b² + c² − 2bc ⋅ cos(A)</span>
+                    <span class="math-formula">b² = a² + c² − 2ac ⋅ cos(B)</span>
+                    <span class="math-formula">c² = a² + b² − 2ab ⋅ cos(C)</span>
                     <ul style="margin-left: 20px; font-size: 14px; margin-top: 10px;">
                         <li><strong style="color:var(--danger);">Caso LAL:</strong> Conoces dos lados y el ángulo que se forma exactamente entre ellos. No tienes un "par" de lado-ángulo opuesto.</li>
                         <li><strong style="color:var(--danger);">Caso LLL:</strong> Conoces los tres lados, pero ningún ángulo. Puedes despejar la fórmula para encontrar cualquier ángulo interior usando los inversos del coseno.</li>
